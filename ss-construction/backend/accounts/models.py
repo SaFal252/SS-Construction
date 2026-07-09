@@ -30,6 +30,8 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, default='')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
     is_active = models.BooleanField(default=True)
+    email_verified = models.BooleanField(default=False)
+    email_verified_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     USERNAME_FIELD = 'email'
@@ -93,3 +95,59 @@ class PendingSignup(models.Model):
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+
+class EmailVerificationToken(models.Model):
+    """Stores email verification tokens for new user signups."""
+    
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='email_verification_token')
+    token = models.CharField(max_length=255, unique=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'EmailVerificationToken'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['token']),
+            models.Index(fields=['user']),
+            models.Index(fields=['expires_at']),
+            models.Index(fields=['is_used']),
+        ]
+    
+    def __str__(self):
+        return f"EmailVerificationToken for {self.user.email}"
+    
+    def is_valid(self):
+        """Check if token is valid (not used and not expired)."""
+        return not self.is_used and timezone.now() < self.expires_at
+
+
+class PasswordResetToken(models.Model):
+    """Stores password reset tokens."""
+    
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='password_reset_token')
+    token = models.CharField(max_length=255, unique=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'PasswordResetToken'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['token']),
+            models.Index(fields=['user']),
+            models.Index(fields=['expires_at']),
+            models.Index(fields=['is_used']),
+        ]
+    
+    def __str__(self):
+        return f"PasswordResetToken for {self.user.email}"
+    
+    def is_valid(self):
+        """Check if token is valid (not used and not expired)."""
+        return not self.is_used and timezone.now() < self.expires_at

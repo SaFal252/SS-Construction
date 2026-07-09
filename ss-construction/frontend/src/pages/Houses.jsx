@@ -64,7 +64,7 @@ const HousesPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       {/* Hero Section - Dark Navy */}
-      <div className="bg-[#1a2744] py-16">
+      <div className="bg-[#1B6CA8] py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold text-white text-center mb-4">
             Find Your Dream Property
@@ -81,7 +81,7 @@ const HousesPage = () => {
                 placeholder="Search by name or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-6 py-4 rounded-full bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#B8860B] text-lg"
+                className="w-full px-6 py-4 rounded-full bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#F5C518] text-lg"
               />
               <svg 
                 className="absolute right-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" 
@@ -117,7 +117,7 @@ const HousesPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#B8860B]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F5C518]"></div>
           </div>
         ) : filteredProperties.length === 0 ? (
           <div className="text-center py-12">

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Your Email</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #B8860B; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+        .content { background-color: #f9f9f9; padding: 30px; border: 1px solid #ddd; }
+        .button { display: inline-block; background-color: #B8860B; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #999; border-top: 1px solid #ddd; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to SS Construction</h1>
+        </div>
+        <div class="content">
+            <p>Hi {{ user.full_name|default:"there" }},</p>
+            
+            <p>Thank you for creating an account with SS Construction. To complete your registration and verify your email, please click the button below:</p>
+            
+            <center>
+                <a href="{{ verification_link }}" class="button">Verify Email</a>
+            </center>
+            
+            <p>Or copy and paste this link in your browser:</p>
+            <p><small>{{ verification_link }}</small></p>
+            
+            <p>This verification link will expire in {{ timeout_days }} days.</p>
+            
+            <p>If you did not create this account, please ignore this email.</p>
+            
+            <p>Best regards,<br>SS Construction Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 SS Construction. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

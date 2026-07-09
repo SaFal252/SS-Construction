@@ -40,10 +40,10 @@ class SellRequest(models.Model):
     """Model for sell requests from customers."""
     
     PROPERTY_TYPE_CHOICES = [
-        ('apartment', 'Apartment'),
-        ('house', 'House'),
-        ('land', 'Land'),
         ('commercial', 'Commercial'),
+        ('residential', 'Residential'),
+        ('semi_bungalow', 'Semi Bungalow'),
+        ('bungalow', 'Bungalow'),
     ]
     
     name = models.CharField(max_length=100)

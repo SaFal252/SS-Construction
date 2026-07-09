@@ -239,7 +239,12 @@ const Properties = () => {
                         </span>
                         {property.is_featured && (
                           <span className="inline-flex px-2.5 py-1 text-[10px] font-black uppercase rounded-lg bg-orange-50 text-orange-600 border border-orange-100 w-fit">
-                            Featured
+                            Exclusive
+                          </span>
+                        )}
+                        {property.is_new && (
+                          <span className="inline-flex px-2.5 py-1 text-[10px] font-black uppercase rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 w-fit">
+                            Recent
                           </span>
                         )}
                       </div>

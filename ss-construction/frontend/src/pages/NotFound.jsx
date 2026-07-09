@@ -14,7 +14,7 @@ const NotFound = () => {
         <div className="text-center max-w-md">
           {/* 404 Image/Icon */}
           <div className="mb-8">
-            <div className="text-[#B8860B] text-8xl font-bold opacity-20 mx-auto">404</div>
+            <div className="text-[#F5C518] text-8xl font-bold opacity-20 mx-auto">404</div>
           </div>
           
           <h1 className="text-3xl font-bold text-gray-800 mb-4">Page Not Found</h1>
@@ -25,14 +25,14 @@ const NotFound = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#B8860B] text-white rounded-lg hover:bg-[#9a7209] transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#F5C518] text-[#1a1a2e] rounded-lg hover:bg-[#D4A017] transition-colors"
             >
               <Home size={20} />
               Back to Home
             </Link>
             <button
               onClick={() => window.history.back()}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-[#B8860B] hover:text-[#B8860B] transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-[#F5C518] hover:text-[#F5C518] transition-colors"
             >
               <ArrowLeft size={20} />
               Go Back

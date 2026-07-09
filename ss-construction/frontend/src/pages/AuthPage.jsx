@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
 
 const AuthPage = ({ mode }) => {
@@ -17,7 +18,7 @@ const AuthPage = ({ mode }) => {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   
-  const { login, register, isAuthenticated, isAdmin } = useAuth()
+  const { login, register, isAuthenticated, isAdmin, handleGoogleLogin } = useAuth()
   const navigate = useNavigate()
 
   // Sync with mode prop when it changes
@@ -145,17 +146,39 @@ const AuthPage = ({ mode }) => {
   }
 
   const toggleMode = () => {
-    setIsLogin(!isLogin)
+    const newMode = !isLogin
+    setIsLogin(newMode)
     setError('')
     setSuccess('')
+    if (newMode) {
+      navigate('/login', { replace: true })
+    } else {
+      navigate('/signup', { replace: true })
+    }
+  }
+
+  const closeModal = () => {
+    // Always close modal and replace history so it doesn't toggle between modes
+    navigate('/', { replace: true })
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-md border border-gray-700">
+    <div className="fixed inset-0 z-[1000] pt-[70px] overflow-auto bg-black/60 px-4" onClick={closeModal}>
+      <div className="flex items-start justify-center min-h-[calc(100vh-70px)]">
+        <div onClick={(e) => e.stopPropagation()} className="relative z-[1001] bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-md border border-gray-700 max-h-[calc(100vh-140px)] overflow-auto">
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={closeModal}
+            className="absolute top-3 right-3 text-gray-300 hover:text-white bg-transparent p-1 rounded-full"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#B8860B]">SS Construction</h1>
+          <h1 className="text-3xl font-bold text-[#F5C518]">SS Construction</h1>
           <p className="text-gray-400 mt-2">Build Your Dream Home</p>
           
           {/* Toggle Switch */}
@@ -163,10 +186,10 @@ const AuthPage = ({ mode }) => {
             <div className="bg-gray-700 rounded-full p-1 flex">
               <button
                 type="button"
-                onClick={() => { setIsLogin(true); setError(''); setSuccess(''); }}
+                onClick={() => { setIsLogin(true); setError(''); setSuccess(''); navigate('/login', { replace: true }); }}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
                   isLogin 
-                    ? 'bg-[#B8860B] text-white' 
+                    ? 'bg-[#F5C518] text-[#1a1a2e]' 
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -174,10 +197,10 @@ const AuthPage = ({ mode }) => {
               </button>
               <button
                 type="button"
-                onClick={() => { navigate('/signup-otp'); }}
+                onClick={() => { setIsLogin(false); setError(''); setSuccess(''); navigate('/signup', { replace: true }); }}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
                   !isLogin 
-                    ? 'bg-[#B8860B] text-white' 
+                    ? 'bg-[#F5C518] text-[#1a1a2e]' 
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -228,7 +251,7 @@ const AuthPage = ({ mode }) => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-[#B8860B] transition-colors"
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-[#F5C518] transition-colors"
                 placeholder="Enter your email"
                 required
               />
@@ -245,7 +268,7 @@ const AuthPage = ({ mode }) => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-[#B8860B] transition-colors pr-12"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-[#F5C518] transition-colors pr-12"
                   placeholder="Enter your password"
                   required
                 />
@@ -282,6 +305,24 @@ const AuthPage = ({ mode }) => {
                 'Sign In'
               )}
             </button>
+
+            {/* Google Login Divider */}
+            <div className="my-6 flex items-center">
+              <div className="flex-grow border-t border-gray-600"></div>
+              <span className="px-3 text-gray-400 text-sm">OR</span>
+              <div className="flex-grow border-t border-gray-600"></div>
+            </div>
+
+            {/* Google Login Button */}
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => setError('Google login failed')}
+                theme="filled_black"
+                size="large"
+                text="signin_with"
+              />
+            </div>
           </form>
         ) : (
           /* Signup Form */
@@ -435,6 +476,7 @@ const AuthPage = ({ mode }) => {
           <Link to="/admin/login" className="text-gray-500 text-xs hover:text-gray-400">
             Admin Login
           </Link>
+        </div>
         </div>
       </div>
     </div>

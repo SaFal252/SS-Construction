@@ -5,8 +5,6 @@ import { FavoritesProvider } from './context/FavoritesContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import FloatingButtons from './components/FloatingButtons'
-import MobileBottomBar from './components/MobileBottomBar'
 // import Login from './pages/Login' // obsolete
 // import Signup from './pages/Signup' // obsolete
 // import Register from './pages/Register' // obsolete
@@ -20,6 +18,8 @@ import PropertyDetail from './pages/PropertyDetail'
 import Portfolio from './pages/Portfolio'
 import SellProperty from './pages/SellProperty'
 import BuildProperty from './pages/BuildProperty'
+import Services from './pages/Services'
+import ServiceDetail from './pages/ServiceDetail'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Favorites from './pages/Favorites'
@@ -36,6 +36,12 @@ const SellRequests = lazy(() => import('./admin/SellRequests'))
 const BuildRequests = lazy(() => import('./admin/BuildRequests'))
 const Users = lazy(() => import('./admin/Users'))
 const Settings = lazy(() => import('./admin/Settings'))
+const ManageServices = lazy(() => import('./admin/ManageServices'))
+const ServiceRequests = lazy(() => import('./admin/ServiceRequests'))
+const Customers = lazy(() => import('./admin/Customers'))
+const CustomerForm = lazy(() => import('./admin/CustomerForm'))
+const CustomerDetail = lazy(() => import('./admin/CustomerDetail'))
+const Reports = lazy(() => import('./admin/Reports'))
 
 // Loading fallback
 const AdminLoadingFallback = () => (
@@ -50,8 +56,6 @@ const PublicLayout = ({ children }) => (
     <Navbar />
     {children}
     <Footer />
-    <FloatingButtons />
-    <MobileBottomBar />
   </>
 )
 
@@ -83,7 +87,7 @@ function App() {
             path="/signup"
             element={
               <PublicLayout>
-                <Navigate to="/signup-otp" replace />
+                <AuthPage mode="signup" />
               </PublicLayout>
             }
           />
@@ -173,10 +177,18 @@ function App() {
           
           {/* Services Page */}
           <Route
-            path="/services"
+            path="/home-improvement"
             element={
               <PublicLayout>
-                <Contact />
+                <Services />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/service/:id"
+            element={
+              <PublicLayout>
+                <ServiceDetail />
               </PublicLayout>
             }
           />
@@ -300,6 +312,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/service-requests"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <ServiceRequests />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
           
           <Route
             path="/admin/users"
@@ -318,6 +340,72 @@ function App() {
               <ProtectedRoute adminOnly={true}>
                 <Suspense fallback={<AdminLoadingFallback />}>
                   <Settings />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/services"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <ManageServices />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/customers"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <Customers />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/customers/add"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <CustomerForm />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/customers/:id"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <CustomerDetail />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/customers/:id/edit"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <CustomerForm />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <Reports />
                 </Suspense>
               </ProtectedRoute>
             }

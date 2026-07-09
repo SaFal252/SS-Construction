@@ -8,7 +8,9 @@ const AdminLayout = ({ children }) => {
   const [badgeCounts, setBadgeCounts] = useState({
     inquiries: 0,
     sellRequests: 0,
-    buildRequests: 0
+    buildRequests: 0,
+    serviceRequests: 0,
+    crmLeads: 0,
   })
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -55,10 +57,13 @@ const AdminLayout = ({ children }) => {
         api.get(`/properties/build/?search=${searchQuery}`)
       ])
 
+      const crmRes = await api.get(`/crm/customers/?search=${searchQuery}`)
+
       const results = [
         ...(propRes.data.results || propRes.data).map(item => ({ ...item, type: 'Property', link: `/admin/properties` })),
         ...(inqRes.data.results || inqRes.data).map(item => ({ ...item, type: 'Inquiry', link: `/admin/inquiry` })),
-        ...(buildRes.data.results || buildRes.data).map(item => ({ ...item, type: 'Build Project', link: `/admin/build-projects` }))
+        ...(buildRes.data.results || buildRes.data).map(item => ({ ...item, type: 'Build Project', link: `/admin/build-projects` })),
+        ...(crmRes.data.results || crmRes.data).map(item => ({ ...item, type: 'Customer', link: `/admin/customers/${item.id}` }))
       ].slice(0, 8) // Limit to top 8 results for the dropdown
 
       setSearchResults(results)
@@ -71,11 +76,13 @@ const AdminLayout = ({ children }) => {
 
   const fetchCounts = async () => {
     try {
-      const [inquiriesRes, sellRes, buildRes] = await Promise.all([
+      const [inquiriesRes, sellRes, buildRes, serviceReqRes] = await Promise.all([
         api.get('/inquiries/'),
         api.get('/inquiries/sell-requests/'),
-        api.get('/properties/build/')
+        api.get('/properties/build/'),
+        api.get('/services/requests/'),
       ])
+      const crmSummaryRes = await api.get('/crm/reports/summary/')
       
       const inquiries = inquiriesRes.data.results || inquiriesRes.data
       const sellRequests = sellRes.data.results || sellRes.data
@@ -87,7 +94,9 @@ const AdminLayout = ({ children }) => {
       setBadgeCounts({
         inquiries: generalInquiries.filter(i => !i.is_read).length,
         sellRequests: sellRequests.length,
-        buildRequests: buildRequests.filter(i => !i.is_read).length
+        buildRequests: buildRequests.filter(i => !i.is_read).length,
+        serviceRequests: (serviceReqRes.data.results || serviceReqRes.data).filter(r => !r.is_read).length,
+        crmLeads: crmSummaryRes.data.new_leads || 0,
       })
     } catch (error) {
       console.error('Error fetching layout counts:', error)
@@ -123,6 +132,23 @@ const AdminLayout = ({ children }) => {
       icon: 'M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-4.5 4.5 4.5M6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm3-3h.008v.008H9.75V12Zm3 0h.008v.008h-.008V12Zm0 3h.008v.008h-.008V15Z',
       badge: badgeCounts.buildRequests 
     },
+    {
+      name: 'Service Requests',
+      path: '/admin/service-requests',
+      icon: 'M3 8.5a4 4 0 014-4h10a4 4 0 014 4v7a4 4 0 01-4 4H7a4 4 0 01-4-4v-7z',
+      badge: badgeCounts.serviceRequests || 0
+    },
+    {
+      name: 'Customers',
+      path: '/admin/customers',
+      icon: 'M17 21h5v-2a4 4 0 00-5-3.87M9 21H4v-2a4 4 0 015-3.87m8-7.13a4 4 0 11-8 0 4 4 0 018 0z',
+      badge: badgeCounts.crmLeads || 0,
+    },
+    {
+      name: 'Reports',
+      path: '/admin/reports',
+      icon: 'M9 17v-6m4 6V7m4 10v-3M5 21h14a2 2 0 002-2V5',
+    },
   ]
 
   const handleLogout = () => {
@@ -140,7 +166,7 @@ const AdminLayout = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-[#1a1a1a] transform transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed top-0 left-0 z-50 h-full w-72 max-w-[85vw] bg-[#1a1a1a] transform transition-transform lg:w-64 lg:max-w-none lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-gray-700">
           <Link to="/" className="text-xl font-bold text-[#B8860B]">SS Properties</Link>
           <p className="text-xs text-gray-400">Admin Panel</p>
@@ -194,7 +220,7 @@ const AdminLayout = ({ children }) => {
       <div className="lg:ml-64">
         {/* Top bar */}
         <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-6">
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 text-gray-600 hover:text-accent transition-colors"
@@ -203,7 +229,7 @@ const AdminLayout = ({ children }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div className="flex-1 max-w-2xl px-8" ref={searchRef}>
+            <div className="w-full lg:flex-1 lg:max-w-2xl lg:px-8" ref={searchRef}>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,7 +273,7 @@ const AdminLayout = ({ children }) => {
                               {result.title || result.name || 'Untitled Record'}
                             </p>
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                              {result.type} • {result.location || result.inquiry_type || 'General'}
+                                {result.type} • {result.location || result.city || result.inquiry_type || 'General'}
                             </p>
                           </div>
                           <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
@@ -269,7 +295,7 @@ const AdminLayout = ({ children }) => {
               )}
             </div>
           </div>
-            <div className="flex items-center space-x-6 ml-auto">
+            <div className="flex items-center justify-between gap-4 lg:ml-auto lg:justify-normal lg:space-x-6">
               <div className="hidden md:flex flex-col text-right">
                 <p className="text-sm font-bold text-gray-900 leading-none mb-1">{user?.full_name}</p>
                 <p className="text-xs text-accent font-semibold uppercase tracking-wider leading-none">{user?.role}</p>

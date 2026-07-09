@@ -22,6 +22,8 @@ const PropertyCard = ({ property }) => {
   
   // For API properties, house_type is used; for sample, type is used
   const propertyType = property.house_type || property.type || 'Property'
+  const isFeaturedProperty = property.is_featured || property.isFeatured
+  const isNewProperty = property.is_new || property.isNew
 
   const formatPrice = (price) => {
     // For sample properties, show in Lakhs
@@ -111,12 +113,12 @@ const PropertyCard = ({ property }) => {
         
         {/* Badges */}
         <div className="absolute top-3 left-3 flex gap-2">
-          {isSampleProperty && property.isFeatured && (
+          {(isSampleProperty ? property.isFeatured : isFeaturedProperty) && (
             <span className="bg-accent text-primary px-3 py-1 rounded-full text-xs font-bold">
-              FEATURED
+              EXCLUSIVE
             </span>
           )}
-          {isSampleProperty && property.isNew && (
+          {(isSampleProperty ? property.isNew : isNewProperty) && (
             <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
               NEW
             </span>

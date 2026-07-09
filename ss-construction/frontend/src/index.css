@@ -4,13 +4,13 @@
 
 /* Base styles */
 :root {
-  --primary: #0A1628;
-  --primary-light: #1a2942;
+  --primary: #0d1b2a;
+  --primary-light: #142833;
   --accent: #FFD700;
   --accent-dark: #B8860B;
   --accent-light: #FFE44D;
-  --secondary: #F8F5F0;
-  --card: #1a2942;
+  --secondary: #ffffff;
+  --card: #142833;
 }
 
 * {
@@ -40,12 +40,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent-dark);
+  background: var(--accent);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: var(--accent-dark);
 }
 
 /* Typography */
@@ -261,27 +261,32 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Card styles */
-.card {
-  @apply bg-card rounded-xl overflow-hidden transition-all duration-300;
-  @apply hover:-translate-y-2 hover:shadow-xl hover:shadow-accent/10;
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  text-decoration: none;
+  padding-bottom: 6px; /* space for the underline */
 }
 
-.card-hover-border {
-  @apply border-2 border-transparent transition-all duration-300;
-  @apply hover:border-accent;
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0; /* sit just below text due to padding */
+  height: 3px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 220ms cubic-bezier(.2,.9,.2,1);
 }
 
-/* Gradient backgrounds */
-.gradient-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-}
-
-.gradient-accent {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-}
-
-.gradient-hero {
-  background: linear-gradient(180deg, rgba(10, 22, 40, 0.3) 0%, rgba(10, 22, 40, 0.9) 100%);
+.nav-link:hover::after,
+.nav-link.active::after,
+.nav-link[aria-current='page']::after {
+  transform: scaleX(1);
 }
 
 /* Glass effect */
@@ -310,16 +315,28 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Navbar link hover effect */
 .nav-link {
-  @apply relative;
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .nav-link::after {
   content: '';
-  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300;
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms ease;
 }
 
-.nav-link:hover::after {
-  @apply w-full;
+.nav-link:hover::after,
+.nav-link.active::after,
+.nav-link[aria-current='page']::after {
+  transform: scaleX(1);
 }
 
 /* Property badge */

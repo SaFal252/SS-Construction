@@ -87,8 +87,8 @@ const SellProperty = () => {
   }
 
   const propertyTypes = [
-    { value: 'residential', label: 'Residential' },
     { value: 'commercial', label: 'Commercial' },
+    { value: 'residential', label: 'Residential' },
     { value: 'semi_bungalow', label: 'Semi Bungalow' },
     { value: 'bungalow', label: 'Bungalow' },
   ]
@@ -206,7 +206,7 @@ const SellProperty = () => {
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Property Photos
                   </label>
-                  <div className="border-2 border-dashed border-gray-600 rounded-xl p-6 text-center hover:border-[#B8860B] transition-colors">
+                  <div className="border-2 border-dashed border-gray-600 rounded-xl p-6 text-center hover:border-[#F5C518] transition-colors">
                     <input
                       type="file"
                       accept="image/*"
@@ -226,7 +226,7 @@ const SellProperty = () => {
                   
                   {imagePreviews.length > 0 && (
                     <div className="mt-3 text-center">
-                      <label htmlFor="property-images" className="cursor-pointer text-[#B8860B] hover:text-[#DAA520] text-sm font-medium">
+                      <label htmlFor="property-images" className="cursor-pointer text-[#F5C518] hover:text-[#D4A017] text-sm font-medium">
                         + Add More Photos
                       </label>
                     </div>

@@ -368,7 +368,7 @@ const PropertyDetail = () => {
                         type="file"
                         accept="image/*"
                         onChange={(e) => setInquiryImage(e.target.files[0])}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#B8860B]/20 outline-none transition-all text-gray-900 font-medium"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#F5C518]/20 outline-none transition-all text-gray-900 font-medium"
                       />
                       {inquiryImage && (
                         <p className="text-sm text-green-600 mt-1">Selected: {inquiryImage.name}</p>

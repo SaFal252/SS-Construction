@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import { siteSettingsAPI } from '../api';
 import PageLoader from '../components/PageLoader';
+import PropertyCard from '../components/PropertyCard';
 import { useAuth } from '../context/AuthContext';
 
 // Removed sampleProperties array for cleaner code. Use API data only.
@@ -65,6 +66,8 @@ const Home = () => {
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(true)
   const [properties, setProperties] = useState([])
   const [filteredProperties, setFilteredProperties] = useState([])
+  const [exclusiveProperties, setExclusiveProperties] = useState([])
+  const [recentProperties, setRecentProperties] = useState([])
   const [buildProjects, setBuildProjects] = useState([])
   const [loading, setLoading] = useState(false)
   const [activeFilter, setActiveFilter] = useState('All')
@@ -88,6 +91,24 @@ const Home = () => {
         const propsData = propertiesRes.data.results || propertiesRes.data
         setProperties(propsData)
         setFilteredProperties(propsData)
+
+        // Fetch exclusive properties for home showcase
+        try {
+          const featuredRes = await api.get('/properties/featured/')
+          const featuredData = featuredRes.data.results || featuredRes.data
+          setExclusiveProperties(featuredData.slice(0, 4))
+        } catch (e) {
+          console.log('Exclusive properties not available')
+        }
+
+        // Fetch recent approved properties for home showcase
+        try {
+          const recentRes = await api.get('/properties/approved/')
+          const recentData = recentRes.data.results || recentRes.data
+          setRecentProperties(recentData.slice(0, 6))
+        } catch (e) {
+          console.log('Recent properties not available')
+        }
         
         // Fetch build projects
         try {
@@ -237,7 +258,7 @@ const Home = () => {
       {/* Hero Section */}
       <section 
         ref={heroRef}
-        className="relative h-screen flex items-center justify-center overflow-hidden"
+        className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-24 pb-28 md:pb-0"
       >
         {/* Background Image */}
         <div 
@@ -253,27 +274,27 @@ const Home = () => {
         {/* Content */}
         <div className="relative z-10 text-center text-white px-4 max-w-5xl mx-auto animate-fade-in-up animate-delay-200">
           <h1 
-            className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-6 animate-slide-in-down animate-delay-300"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-6 animate-slide-in-down animate-delay-300"
             style={{ textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}
           >
             Find Your{' '}
             <span className="text-accent animate-pulse">Dream House</span>
           </h1>
           <p 
-            className="text-xl md:text-2xl mb-10 text-gray-200 animate-fade-in-up animate-delay-500"
+            className="text-base sm:text-lg md:text-2xl mb-10 text-gray-200 animate-fade-in-up animate-delay-500"
           >
             Premium Properties in <span className="text-accent">Tokha, Tarkeshwor</span>
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-delay-700">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-delay-700 px-2 sm:px-0">
             <Link
               to="/buy"
-              className="btn-primary text-lg px-8 py-4 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+              className="btn-primary text-base sm:text-lg px-8 py-4 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
             >
               View Properties
             </Link>
             <Link
               to="/contact"
-              className="btn-secondary text-lg px-8 py-4 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+              className="btn-secondary text-base sm:text-lg px-8 py-4 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
             >
               Contact Us
             </Link>
@@ -309,7 +330,7 @@ const Home = () => {
       {/* Stats Bar */}
       <section className="py-16 bg-gradient-to-r from-accent-dark to-accent">
         <div className="container-custom">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
             {stats.map((stat, index) => (
               <div
                 key={index}
@@ -326,6 +347,68 @@ const Home = () => {
 
 
 
+      {/* Exclusive Properties */}
+      <section className="section-padding bg-primary">
+        <div className="container-custom">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-12 animate-fade-in-up animate-delay-200">
+            <div>
+              <h2 className="section-title text-secondary">Exclusive Properties</h2>
+              <p className="text-gray-400 mt-4 max-w-2xl">
+                Handpicked premium properties featured by our admin team.
+              </p>
+            </div>
+            <Link to="/buy" className="btn-secondary w-fit">
+              View All Properties
+            </Link>
+          </div>
+
+          {exclusiveProperties.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+              {exclusiveProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-card rounded-3xl p-10 text-center border border-white/10">
+              <p className="text-gray-400 font-medium">
+                No exclusive properties yet. Mark a property as exclusive from the admin panel to feature it here.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Recent Properties */}
+      <section className="section-padding bg-primary-light">
+        <div className="container-custom">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-12 animate-fade-in-up animate-delay-200">
+            <div>
+              <h2 className="section-title text-secondary">Recent Properties</h2>
+              <p className="text-gray-400 mt-4 max-w-2xl">
+                Latest approved listings added to our collection.
+              </p>
+            </div>
+            <Link to="/buy" className="btn-primary w-fit">
+              Explore Buy Property
+            </Link>
+          </div>
+
+          {recentProperties.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {recentProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-card rounded-3xl p-10 text-center border border-white/10">
+              <p className="text-gray-400 font-medium">
+                No recent properties available right now.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Why Choose Us */}
       <section className="section-padding bg-primary">
         <div className="container-custom">
@@ -335,7 +418,7 @@ const Home = () => {
               Experience the difference of working with a trusted construction partner
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {displayWhyChooseUs.map((item, index) => (
               <div
                 key={index}
@@ -362,7 +445,7 @@ const Home = () => {
               Comprehensive construction and real estate solutions tailored to your needs
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Buy/Sell Property */}
             <Link 
               to="/buy" 
@@ -409,6 +492,22 @@ const Home = () => {
               <p className="text-gray-400">
                 Build your dream home with our expert construction team. We deliver quality 
                 construction in Tokha, Tarkeshwor, and beyond.
+              </p>
+            </Link>
+            {/* Home Improvement & Services */}
+            <Link
+              to="/home-improvement"
+              className="group bg-card rounded-2xl p-8 card card-hover-border animate-fade-in-up animate-delay-600 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+            >
+              <div className="w-20 h-20 bg-accent/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors animate-pulse animate-delay-800">
+                <svg className="w-10 h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M6 7v13a1 1 0 001 1h10a1 1 0 001-1V7M8 7V4a2 2 0 012-2h4a2 2 0 012 2v3" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-heading font-semibold text-secondary mb-3 group-hover:text-accent transition-colors">Home Improvement & Services</h3>
+              <p className="text-gray-400">
+                Professional home improvement, renovation and trade services to maintain
+                and upgrade your property — plumbing, electrical, carpentry and more.
               </p>
             </Link>
           </div>
@@ -493,7 +592,7 @@ const Home = () => {
                   </div>
                   <div>
                     <p className="text-secondary font-medium">Email</p>
-                    <p className="text-gray-400">surajandsupriya@gmail.com</p>
+                    <p className="text-gray-400">surajandsupriyaconstruction@gmail.com</p>
                   </div>
                 </div>
               </div>

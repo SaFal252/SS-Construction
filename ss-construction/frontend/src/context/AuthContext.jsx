@@ -109,6 +109,38 @@ export const AuthProvider = ({ children }) => {
     return response.data
   }
 
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      const response = await api.post('/auth/google/', { 
+        token: credentialResponse.credential 
+      })
+      
+      if (response.data.success || response.data.token) {
+        // Save tokens
+        localStorage.setItem('access_token', response.data.token)
+        localStorage.setItem('refresh_token', response.data.refresh)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+        
+        // Set axios default header
+        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
+        
+        // Set user
+        setUser(response.data.user)
+        
+        // Redirect based on role
+        const user = response.data.user
+        if (user.role === 'admin') {
+          navigate('/admin/dashboard')
+        } else {
+          navigate('/')
+        }
+      }
+    } catch (err) {
+      console.error('Google login error:', err)
+      throw new Error(err.response?.data?.error || 'Google authentication failed')
+    }
+  }
+
   // Computed values — consistent admin detection
   const isLoggedIn = !!user
   const isAdmin = user?.is_staff || user?.is_superuser || user?.role === 'admin'
@@ -122,6 +154,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     changePassword,
+    handleGoogleLogin,
     isAuthenticated: isLoggedIn,
     isAdmin,
     isPublicUser,

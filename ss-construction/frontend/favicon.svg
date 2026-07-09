@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="64" height="64">
+  <rect width="120" height="120" rx="16" fill="#0b1f2e" />
+  <!-- First S building shape -->
+  <path d="M18 35 L18 82 L45 82 L45 63 L31 63 L31 50 L45 50 L45 35 Z" fill="#FFD700"/>
+  <!-- Second S building shape -->
+  <path d="M45 35 L45 82 L72 82 L72 63 L58 63 L58 50 L72 50 L72 35 Z" fill="#B8860B"/>
+  <!-- Roof -->
+  <path d="M82 45 L97 63 L67 63 Z" fill="#FFD700"/>
+  <!-- Base -->
+  <rect x="77" y="63" width="18" height="14" fill="#111" />
+  <!-- Door -->
+  <rect x="82" y="69" width="8" height="8" fill="#FFD700" />
+</svg>

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
-import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
 const BuildProperty = () => {
@@ -57,8 +56,7 @@ const BuildProperty = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0d1b2e' }}>
-      {/* Navbar */}
-      <Navbar />
+      
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4">
@@ -93,7 +91,7 @@ const BuildProperty = () => {
                 </div>
                 <div className="rounded-xl p-6" style={{ backgroundColor: '#0d1b2e', border: '1px solid #1e3a5f' }}>
                   <p className="text-sm mb-2" style={{ color: '#8fa3b8' }}>Email</p>
-                  <p className="text-white font-semibold">surajandsupriya@gmail.com</p>
+                  <p className="text-white font-semibold break-words whitespace-normal text-sm">surajandsupriyaconstruction@gmail.com</p>
                 </div>
                 <div className="rounded-xl p-6" style={{ backgroundColor: '#0d1b2e', border: '1px solid #1e3a5f' }}>
                   <p className="text-sm mb-2" style={{ color: '#8fa3b8' }}>WhatsApp</p>
@@ -327,7 +325,7 @@ const BuildProperty = () => {
                   <span>📞</span> +977 9810163311
                 </li>
                 <li className="flex items-center gap-2">
-                  <span>✉</span> surajandsupriya@gmail.com
+                  <span>✉</span> surajandsupriyaconstruction@gmail.com
                 </li>
                 <li className="flex items-center gap-2">
                   <span>💬</span> WhatsApp

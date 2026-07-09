@@ -8,6 +8,7 @@ router.register(r'users', views.UserViewSet, basename='user')
 urlpatterns = [
     path('register/', views.RegisterView.as_view(), name='register'),
     path('login/', views.login_view, name='login'),
+    path('google/', views.google_login_view, name='google_login'),
     path('send-otp/', views.send_otp_view, name='send_otp'),
     path('verify-otp/', views.verify_otp_view, name='verify_otp'),
     path('refresh/', views.token_refresh_view, name='token_refresh'),
@@ -15,4 +16,7 @@ urlpatterns = [
     path('me/', views.me_view, name='me'),
     path('profile/', views.me_view, name='profile'),
     path('change-password/', views.change_password_view, name='change_password'),
+    path('verify-email/', views.verify_email_view, name='verify_email'),
+    path('forgot-password/', views.forgot_password_view, name='forgot_password'),
+    path('reset-password/', views.reset_password_view, name='reset_password'),
 ] + router.urls

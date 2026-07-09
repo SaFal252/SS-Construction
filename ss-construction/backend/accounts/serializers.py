@@ -95,3 +95,38 @@ class SignupSendOTPSerializer(serializers.Serializer):
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.RegexField(regex=r'^\d{6}$', max_length=6, min_length=6)
+
+
+class VerifyEmailSerializer(serializers.Serializer):
+    """Serializer for email verification."""
+    token = serializers.CharField()
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    """Serializer for forgot password request."""
+    email = serializers.EmailField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """Serializer for password reset."""
+    token = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    confirm_password = serializers.CharField(write_only=True)
+    
+    def validate(self, attrs):
+        if attrs.get('password') != attrs.get('confirm_password'):
+            raise serializers.ValidationError({'password': 'Passwords do not match.'})
+        return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """Serializer for changing password (authenticated users)."""
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, validators=[validate_password])
+    confirm_password = serializers.CharField(write_only=True)
+    
+    def validate(self, attrs):
+        if attrs.get('new_password') != attrs.get('confirm_password'):
+            raise serializers.ValidationError({'new_password': 'Passwords do not match.'})
+        return attrs

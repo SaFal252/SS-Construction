@@ -81,7 +81,7 @@ const Signup = () => {
       <div className="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-md border border-gray-700">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#B8860B]">SS Construction</h1>
+          <h1 className="text-3xl font-bold text-[#F5C518]">SS Construction</h1>
           <p className="text-gray-400 mt-2">Create your account</p>
         </div>
 

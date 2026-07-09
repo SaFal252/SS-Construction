@@ -59,8 +59,8 @@ const Contact = () => {
         </svg>
       ),
       title: 'Email',
-      value: 'surajandsupriya@gmail.com',
-      link: 'mailto:surajandsupriya@gmail.com',
+      value: 'surajandsupriyaconstruction@gmail.com',
+      link: 'mailto:surajandsupriyaconstruction@gmail.com',
     },
     {
       icon: (
@@ -71,7 +71,7 @@ const Contact = () => {
       ),
       title: 'Address',
       value: 'Tokha, Tarkeshwor, Kathmandu, Nepal',
-      link: null,
+      link: 'https://www.google.com/maps/place/SS+Construction+Nepal/@27.7616763,85.3091641,14z/data=!4m6!3m5!1s0x39eb1f056ca6105f:0xc9d02fee490a7767!8m2!3d27.7614987!4d85.3191094!16s%2Fg%2F11z7p9g2fq?entry=ttu&g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D',
     },
   ]
 
@@ -119,8 +119,8 @@ const Contact = () => {
             <div className="mt-10">
               <h3 className="font-heading font-semibold text-secondary mb-4">Find Us</h3>
               <div className="bg-card rounded-2xl h-72 flex items-center justify-center overflow-hidden">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14147.528870224!2d85.326523!3d27.717245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb190a74d5e7b3%3A0xc11c3c1f8d3c9e1!2sTokha%2C%20Kathmandu!5e0!3m2!1sen!2snp!4v1234567890"
+                <iframe
+                  src="https://maps.google.com/maps?q=27.7614987,85.3191094&z=15&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -129,6 +129,16 @@ const Contact = () => {
                   className="rounded-2xl"
                   title="Location Map"
                 />
+              </div>
+              <div className="mt-4 text-center">
+                <a
+                  href="https://www.google.com/maps/place/SS+Construction+Nepal/@27.7616763,85.3091641,14z/data=!4m6!3m5!1s0x39eb1f056ca6105f:0xc9d02fee490a7767!8m2!3d27.7614987!4d85.3191094!16s%2Fg%2F11z7p9g2fq?entry=ttu&g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-3 btn-primary"
+                >
+                  Get Directions
+                </a>
               </div>
             </div>
           </div>

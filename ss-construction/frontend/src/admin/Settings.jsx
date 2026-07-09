@@ -5,7 +5,7 @@ import AdminLayout from './AdminLayout'
 const Settings = () => {
   const [settings, setSettings] = useState({
     site_name: 'SS Construction',
-    site_email: 'surajandsupriya@gmail.com',
+    site_email: 'surajandsupriyaconstruction@gmail.com',
     site_phone: '+977 9810163311',
     site_address: 'Tokha, Tarkeshwor, Kathmandu, Nepal',
     about_text: '',

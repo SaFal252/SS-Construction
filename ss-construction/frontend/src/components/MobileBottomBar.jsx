@@ -11,11 +11,11 @@ const MobileBottomBar = () => {
       transition={{ type: 'spring', stiffness: 100 }}
       className="fixed bottom-0 left-0 right-0 bg-primary/95 backdrop-blur-lg border-t border-white/10 shadow-lg md:hidden z-50"
     >
-      <div className="flex items-center justify-around py-3 px-4">
+      <div className="flex flex-col sm:flex-row items-stretch gap-2 py-3 px-3 sm:px-4">
         {/* Call Now Button */}
         <a
           href={`tel:${phoneNumber}`}
-          className="relative flex items-center gap-2 px-6 py-3 bg-accent text-primary rounded-full font-semibold hover:bg-accent-light transition-all duration-300 hover:scale-105 shadow-lg"
+          className="relative flex w-full sm:flex-1 items-center justify-center gap-2 px-4 py-3 bg-accent text-primary rounded-full font-semibold hover:bg-accent-light transition-all duration-300 hover:scale-105 shadow-lg"
         >
           <Phone size={20} />
           <span>Call Now</span>
@@ -28,7 +28,7 @@ const MobileBottomBar = () => {
           href={`https://wa.me/${phoneNumber}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-full font-semibold hover:bg-green-400 transition-all duration-300 hover:scale-105 shadow-lg"
+          className="relative flex w-full sm:flex-1 items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-full font-semibold hover:bg-green-400 transition-all duration-300 hover:scale-105 shadow-lg"
         >
           <MessageCircle size={20} />
           <span>WhatsApp</span>

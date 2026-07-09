@@ -111,14 +111,14 @@ const BuildProjects = () => {
 
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-10">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-10">
         <div>
           <h1 className="text-3xl font-black text-gray-900 leading-none mb-2">Build Projects</h1>
           <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Construction Pipeline & Portfolio</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
+          className={`w-full md:w-auto px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
             showForm 
               ? 'bg-gray-100 text-gray-400 hover:bg-gray-200' 
               : 'bg-accent text-primary shadow-lg shadow-accent/20 hover:bg-accent/80'
@@ -281,7 +281,7 @@ const BuildProjects = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-6 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-accent/20 transition-all text-sm font-black text-gray-700 cursor-pointer uppercase tracking-widest"
+            className="w-full md:w-auto px-6 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-accent/20 transition-all text-sm font-black text-gray-700 cursor-pointer uppercase tracking-widest"
           >
             <option value="">All Status</option>
             <option value="Planning">Planning</option>
@@ -337,7 +337,7 @@ const BuildProjects = () => {
                   </div>
                 </div>
 
-                <div className="mt-auto p-8 pt-0 flex gap-2">
+                <div className="mt-auto p-8 pt-0 flex flex-col sm:flex-row gap-2">
                   {project.status === 'Planning' && (
                     <button
                       onClick={() => handleStatusChange(project.slug, 'In Progress')}
@@ -356,7 +356,7 @@ const BuildProjects = () => {
                   )}
                   <button
                     onClick={() => handleDelete(project.slug)}
-                    className="p-3 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                    className="p-3 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all self-start sm:self-auto"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -376,4 +376,4 @@ const BuildProjects = () => {
   )
 }
 
-export default BuildProjects
+\export default BuildProjects

@@ -27,6 +27,7 @@ db.sqlite3-journal
 media/
 staticfiles/
 .env
+.env.local
 .venv/
 venv/
 ENV/

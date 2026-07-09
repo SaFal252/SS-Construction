@@ -13,6 +13,8 @@ urlpatterns = [
     path('api/properties/', include('properties.urls')),
     path('api/inquiries/', include('inquiries.urls')),
     path('api/site-settings/', include('site_settings.urls')),
+    path('api/services/', include('services.urls')),
+    path('api/crm/', include('crm.urls')),
     path('api/', include('favorites.urls')),
     path('api/core/settings/', settings_views.get_settings, name='get_settings'),
     path('api/core/settings/', settings_views.update_settings, name='update_settings'),
@@ -22,5 +24,11 @@ urlpatterns = [
     path('sitemap.xml', seo_views.sitemap_xml, name='sitemap_xml'),
 ]
 
+# Serve media files in development and production
 if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    # In production, media files are served by WhiteNoise middleware
+    # Configure your web server (Nginx/Apache) to serve media files directly for best performance
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

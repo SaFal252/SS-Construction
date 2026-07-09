@@ -27,6 +27,14 @@ from .serializers import (
     VerifyOTPSerializer,
 )
 
+# Google OAuth imports
+try:
+    from google.auth.transport import requests as google_requests
+    from google.oauth2 import id_token as google_id_token
+    GOOGLE_AUTH_AVAILABLE = True
+except ImportError:
+    GOOGLE_AUTH_AVAILABLE = False
+
 CustomUser = get_user_model()
 logger = logging.getLogger(__name__)
 
@@ -408,3 +416,210 @@ def verify_otp_view(request):
         },
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def google_login_view(request):
+    """Handle Google OAuth login/signup."""
+    if not GOOGLE_AUTH_AVAILABLE:
+        return Response(
+            {'error': 'Google authentication is not configured'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    
+    token = request.data.get('token')
+    
+    if not token:
+        return Response(
+            {'error': 'Token is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        # Verify the Google token
+        idinfo = google_id_token.verify_oauth2_token(
+            token,
+            google_requests.Request(),
+            settings.GOOGLE_OAUTH_CLIENT_ID
+        )
+        
+        email = idinfo.get('email')
+        name = idinfo.get('name', '')
+        picture = idinfo.get('picture', '')
+        
+        # Create or get user
+        user, created = CustomUser.objects.get_or_create(
+            email=email,
+            defaults={
+                'username': email.split('@')[0].replace('.', '_'),
+                'full_name': name,
+                'is_active': True,
+            }
+        )
+        
+        # Update user info if new
+        if created:
+            user.full_name = name
+            user.save()
+        
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        
+        return Response({
+            'success': True,
+            'token': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': _user_payload(user)
+        }, status=status.HTTP_200_OK)
+        
+    except ValueError as e:
+        # Invalid token
+        logger.warning(f"Google OAuth token verification failed: {str(e)}")
+        return Response(
+            {'error': 'Invalid or expired token'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    except Exception as e:
+        logger.error(f"Google login error: {str(e)}")
+        return Response(
+            {'error': 'Authentication failed'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_email_view(request):
+    """Verify email using token."""
+    from .serializers import VerifyEmailSerializer
+    from .email_utils import verify_email_token
+    
+    serializer = VerifyEmailSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    token = serializer.validated_data['token']
+    
+    is_valid, message = verify_email_token(token)
+    if is_valid:
+        return Response({
+            'message': message,
+            'success': True
+        }, status=status.HTTP_200_OK)
+    else:
+        return Response({
+            'error': message,
+            'success': False
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def forgot_password_view(request):
+    """Request password reset."""
+    from .serializers import ForgotPasswordSerializer
+    from .email_utils import generate_password_reset_token, send_password_reset_email
+    
+    serializer = ForgotPasswordSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    email = serializer.validated_data['email'].lower().strip()
+    
+    try:
+        user = CustomUser.objects.get(email=email)
+        token = generate_password_reset_token(user)
+        send_password_reset_email(user, token)
+        
+        return Response({
+            'message': 'Password reset link has been sent to your email.',
+            'success': True
+        }, status=status.HTTP_200_OK)
+    except CustomUser.DoesNotExist:
+        # Don't reveal if email exists for security
+        return Response({
+            'message': 'If this email is registered, you will receive a password reset link.',
+            'success': True
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Password reset request error: {str(e)}")
+        return Response({
+            'error': 'Failed to send password reset email. Please try again.',
+            'success': False
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reset_password_view(request):
+    """Reset password using token."""
+    from .serializers import ResetPasswordSerializer
+    from .email_utils import verify_password_reset_token
+    
+    serializer = ResetPasswordSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    
+    token = serializer.validated_data['token']
+    password = serializer.validated_data['password']
+    
+    is_valid, user, message = verify_password_reset_token(token)
+    if not is_valid:
+        return Response({
+            'error': message,
+            'success': False
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user.set_password(password)
+        user.save()
+        
+        # Mark token as used
+        from .models import PasswordResetToken
+        token_obj = PasswordResetToken.objects.get(token=token)
+        token_obj.is_used = True
+        token_obj.used_at = timezone.now()
+        token_obj.save()
+        
+        return Response({
+            'message': 'Password reset successfully.',
+            'success': True
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Password reset error: {str(e)}")
+        return Response({
+            'error': 'Failed to reset password. Please try again.',
+            'success': False
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password_view(request):
+    """Change password for authenticated user."""
+    from .serializers import ChangePasswordSerializer
+    
+    serializer = ChangePasswordSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    
+    user = request.user
+    old_password = serializer.validated_data['old_password']
+    new_password = serializer.validated_data['new_password']
+    
+    # Verify old password
+    if not user.check_password(old_password):
+        return Response({
+            'error': 'Old password is incorrect.',
+            'success': False
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user.set_password(new_password)
+        user.save()
+        
+        return Response({
+            'message': 'Password changed successfully.',
+            'success': True
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Change password error: {str(e)}")
+        return Response({
+            'error': 'Failed to change password. Please try again.',
+            'success': False
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

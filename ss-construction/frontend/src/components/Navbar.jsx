@@ -5,11 +5,11 @@ import { useAuth } from '../context/AuthContext'
 import { useFavorites } from '../context/FavoritesContext'
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
-  const { user, logout, isAdmin, isPublicUser, isAuthenticated } = useAuth()
+  const { user, logout, isAdmin, isAuthenticated } = useAuth()
   const { getFavoriteCount } = useFavorites()
   const favoriteCount = getFavoriteCount()
 
@@ -18,6 +18,7 @@ const Navbar = () => {
     { name: 'Buy Property', path: '/buy' },
     { name: 'Sell Property', path: '/sell' },
     { name: 'Build Property', path: '/build-property' },
+    { name: 'Home Improvement & Services', path: '/home-improvement' },
     { name: 'About Us', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ]
@@ -31,25 +32,31 @@ const Navbar = () => {
   }, [])
 
   const isActive = (path) => {
-    return location.pathname === path
+    if (path === '/') {
+      return location.pathname === '/' || location.pathname === ''
+    }
+
+    return (
+      location.pathname === path ||
+      location.pathname === `${path}/` ||
+      location.pathname.startsWith(`${path}/`)
+    )
   }
 
   return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled 
-          ? 'bg-primary/95 backdrop-blur-lg shadow-lg shadow-black/20 py-2' 
+    <nav
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
+        scrolled
+          ? 'bg-primary/95 backdrop-blur-lg shadow-lg shadow-black/20 py-2'
           : 'bg-transparent py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <Logo size="md" />
+        <div className="flex justify-between items-center gap-3">
+          <Link to="/" className="flex items-center flex-shrink-0">
+            <Logo size="lg" className="mr-3" />
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
             {navLinks.map((link, index) => (
               <Link
@@ -65,8 +72,7 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            
-            {/* Favorites Badge */}
+
             <Link
               to="/favorites"
               className="relative ml-2 px-3 py-2 text-sm font-medium transition-all duration-300 text-secondary/80 hover:text-accent group"
@@ -80,20 +86,17 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-            
-            {/* Post Property Button - removed per user request */}
-            
+
             {isAuthenticated ? (
               <div className="relative">
                 {isAdmin ? (
-                  // Admin user - show Admin badge and dropdown
                   <div className="relative">
                     <button
                       onClick={() => setShowDropdown(!showDropdown)}
                       className="ml-2 flex items-center gap-2 text-accent border border-accent/20 bg-accent/5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:bg-accent/10 hover:border-accent/40"
                     >
                       <span className="flex items-center gap-1.5">
-                        <span className="text-lg">👑</span> 
+                        <span className="text-lg">👑</span>
                         Admin: {user?.first_name || user?.full_name?.split(' ')[0] || 'Admin'}
                       </span>
                       <svg className={`w-4 h-4 transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,6 +126,12 @@ const Navbar = () => {
                           </svg>
                           Manage Users
                         </Link>
+                        <Link to="/admin/services" className="flex items-center gap-3 px-4 py-2.5 text-secondary hover:bg-accent/10 transition-colors">
+                          <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Manage Services
+                        </Link>
                         <div className="mt-2 pt-2 border-t border-white/5">
                           <button onClick={logout} className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-red-400 hover:bg-red-400/10 transition-colors font-medium">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,11 +144,10 @@ const Navbar = () => {
                     )}
                   </div>
                 ) : (
-                  // Public user - show welcome message and dropdown
                   <div className="relative">
                     <button
                       onClick={() => setShowDropdown(!showDropdown)}
-                      className="ml-2 flex items-center gap-2 text-[#FFD700] px-3 py-2 text-sm font-medium transition-all duration-300"
+                      className="ml-2 flex items-center gap-2 text-[#F5C518] px-3 py-2 text-sm font-medium transition-all duration-300"
                     >
                       <span>👋 Welcome, {user?.first_name || user?.full_name?.split(' ')[0] || 'User'}!</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,7 +184,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Tablet Navigation */}
           <div className="hidden md:flex lg:hidden items-center space-x-2">
             {navLinks.slice(0, 4).map((link) => (
               <Link
@@ -193,109 +200,114 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg text-secondary hover:text-accent transition-all duration-300 hover:bg-white/10"
-            aria-label="Toggle menu"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        <div 
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isOpen ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
-          <div className="flex flex-col space-y-2 pt-2">
-            {navLinks.map((link, index) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={`block py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
-                  isActive(link.path)
-                    ? 'text-accent bg-accent/10'
-                    : 'text-secondary/80 hover:text-accent hover:bg-white/5'
-                }`}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                {link.name}
-              </Link>
-            ))}
-            
-            {/* Favorites Link - Mobile */}
+          <div className="md:hidden flex items-center gap-2">
             <Link
               to="/favorites"
-              onClick={() => setIsOpen(false)}
-              className={`flex items-center justify-between py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
-                isActive('/favorites')
-                  ? 'text-accent bg-accent/10'
-                  : 'text-secondary/80 hover:text-accent hover:bg-white/5'
-              }`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="relative flex items-center justify-center w-11 h-11 rounded-full border border-white/10 bg-white/5 text-secondary hover:text-accent hover:bg-white/10 transition-all duration-300"
+              aria-label="Favorites"
             >
-              <span>My Favorites</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
               {favoriteCount > 0 && (
-                <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
-                  {favoriteCount}
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center border border-primary">
+                  {favoriteCount > 9 ? '9+' : favoriteCount}
                 </span>
               )}
             </Link>
-            
-            {/* Post Property Button - Mobile */}
-            <Link
-              to={user ? "/dashboard" : "/login"}
-              onClick={() => setIsOpen(false)}
-              className="inline-block mt-4 bg-accent text-primary px-5 py-3 rounded-full font-semibold text-center hover:bg-accent-light transition-all duration-300"
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex items-center justify-center w-11 h-11 rounded-full border border-accent/30 bg-accent/15 text-accent hover:bg-accent hover:text-primary transition-all duration-300 shadow-lg shadow-accent/10"
+              aria-label="Open navigation menu"
             >
-              Post Property
-            </Link>
-            
-            {user ? (
-              <>
-                {isAdmin && (
-                  <Link
-                    to="/admin/dashboard"
-                    onClick={() => setIsOpen(false)}
-                    className="block py-3 px-4 rounded-lg font-medium text-center text-accent bg-accent/10 mt-2"
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
+            mobileMenuOpen ? 'max-h-[520px] opacity-100 mt-3' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="rounded-3xl border border-white/10 bg-primary/98 backdrop-blur-xl shadow-2xl shadow-black/30 p-4">
+            <div className="grid grid-cols-2 gap-3">
+              {navLinks.map((link, index) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`min-h-20 rounded-2xl border px-4 py-3 flex flex-col justify-center transition-all duration-300 ${
+                    isActive(link.path)
+                      ? 'bg-accent/15 border-accent text-accent shadow-lg shadow-accent/10'
+                      : 'bg-white/5 border-white/10 text-secondary/90 hover:bg-white/10 hover:border-white/20'
+                  }`}
+                  style={{ animationDelay: `${index * 40}ms` }}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-[0.22em] opacity-70">Menu</span>
+                  <span className="text-sm font-semibold mt-1 leading-tight">{link.name}</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <Link
+                to="/favorites"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between py-4 px-4 rounded-2xl font-medium transition-all duration-300 border border-white/10 bg-white/5 text-secondary/85 hover:text-accent hover:bg-white/10"
+              >
+                <span>Favorites</span>
+                {favoriteCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                    {favoriteCount > 9 ? '9+' : favoriteCount}
+                  </span>
+                )}
+              </Link>
+
+              {isAuthenticated ? (
+                <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-4 px-4 rounded-2xl font-semibold text-center text-accent bg-accent/10 border border-accent/15"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="block w-full text-left py-4 px-4 rounded-2xl font-semibold text-red-400 border border-red-500/10 bg-red-500/5"
                   >
-                    Dashboard
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-4 px-4 rounded-2xl text-center font-semibold border border-white/10 bg-white/5 text-secondary"
+                  >
+                    Login
                   </Link>
-                )}
-                <button
-                  onClick={() => { logout(); setIsOpen(false); }}
-                  className="block w-full text-left py-3 px-4 rounded-lg font-medium text-red-500 mt-2"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <div className="relative w-full">
-                <button
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  className="block w-full py-3 px-4 rounded-lg font-medium text-center bg-[#B8860B] text-white mt-2"
-                >
-                  Login / Sign Up
-                  <svg className="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 bg-card rounded-lg shadow-lg py-2 z-50">
-                    <Link to="/login" onClick={() => setIsOpen(false)} className="block px-4 py-2 text-secondary hover:bg-accent/10">Login</Link>
-                    <Link to="/signup" onClick={() => setIsOpen(false)} className="block px-4 py-2 text-secondary hover:bg-accent/10">Sign Up</Link>
-                  </div>
-                )}
-              </div>
-            )}
+                  <Link
+                    to="/signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-4 px-4 rounded-2xl text-center font-semibold bg-[#B8860B] text-white shadow-lg shadow-[#B8860B]/20"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

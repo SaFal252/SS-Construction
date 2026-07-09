@@ -25,6 +25,7 @@ const PropertyForm = () => {
     status: '',
     house_type: 'Residential',
     is_featured: false,
+    is_new: false,
     features: [],
     // New fields
     face_direction: '',
@@ -68,6 +69,7 @@ const PropertyForm = () => {
         status: data.status || '',
         house_type: data.house_type || 'Residential',
         is_featured: data.is_featured || false,
+        is_new: data.is_new || false,
         features: data.features || [],
         // New fields
         face_direction: data.face_direction || '',
@@ -120,6 +122,7 @@ const PropertyForm = () => {
     const cleanedData = {
       ...formData,
       is_featured: Boolean(formData.is_featured),
+      is_new: Boolean(formData.is_new),
       price: formData.price !== '' ? parseFloat(formData.price) : null,
       size: formData.size !== '' ? parseFloat(formData.size) : null,
       bedrooms: formData.bedrooms !== '' ? parseInt(formData.bedrooms, 10) : null,
@@ -253,6 +256,34 @@ const PropertyForm = () => {
                 <option value="Semi Bangalow">Semi Bangalow</option>
                 <option value="Bangalow">Bangalow</option>
               </select>
+            </div>
+
+            <div className="md:col-span-2 flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-100 px-4 py-4">
+              <input
+                type="checkbox"
+                name="is_featured"
+                checked={formData.is_featured}
+                onChange={handleChange}
+                className="w-5 h-5 rounded border-gray-300 text-accent focus:ring-accent/20"
+              />
+              <div>
+                <label className="block text-sm font-bold text-gray-900">Mark as Exclusive Property</label>
+                <p className="text-xs text-gray-500">Show this property in the home page exclusive section.</p>
+              </div>
+            </div>
+
+            <div className="md:col-span-2 flex items-center gap-3 rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-4">
+              <input
+                type="checkbox"
+                name="is_new"
+                checked={formData.is_new}
+                onChange={handleChange}
+                className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-200"
+              />
+              <div>
+                <label className="block text-sm font-bold text-gray-900">Mark as Recent Property</label>
+                <p className="text-xs text-gray-500">Show this property in the home page recent section.</p>
+              </div>
             </div>
 
             {/* Specifications Section */}

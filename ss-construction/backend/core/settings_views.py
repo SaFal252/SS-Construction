@@ -7,7 +7,7 @@ from django.conf import settings
 # In-memory storage for settings (you can also use a database model)
 _site_settings = {
     'site_name': 'SS Construction',
-    'site_email': 'info@ssconstruction.com',
+    'site_email': 'surajandsupriyaconstruction@gmail.com',
     'site_phone': '+977 9810163311',
     'site_address': 'Tokha, Tarkeshwor, Kathmandu, Nepal',
     'about_text': '',

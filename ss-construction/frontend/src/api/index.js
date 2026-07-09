@@ -146,3 +146,13 @@ export const siteSettingsAPI = {
   updateWhyChooseUs: (id, data) => api.put(`/site-settings/why-choose-us/${id}/`, data),
   deleteWhyChooseUs: (id) => api.delete(`/site-settings/why-choose-us/${id}/`)
 }
+
+export const crmAPI = {
+  getSummary: () => api.get('/crm/reports/summary/'),
+  getCustomers: (params = {}) => api.get('/crm/customers/', { params }),
+  getCustomer: (id) => api.get(`/crm/customers/${id}/`),
+  createCustomer: (formData) => api.post('/crm/customers/', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  updateCustomer: (id, formData) => api.patch(`/crm/customers/${id}/`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  deleteCustomer: (id) => api.delete(`/crm/customers/${id}/`),
+  addFollowUp: (id, data) => api.post(`/crm/customers/${id}/follow-ups/`, data),
+}

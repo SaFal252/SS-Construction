@@ -191,7 +191,7 @@ const SignupOTP = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4">
       <div className="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-md border border-gray-700">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#B8860B]">SS Construction</h1>
+          <h1 className="text-3xl font-bold text-[#F5C518]">SS Construction</h1>
           <p className="text-gray-400 mt-2">Sign up with Email OTP</p>
         </div>
 

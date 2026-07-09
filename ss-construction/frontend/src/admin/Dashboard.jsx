@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
+import { crmAPI } from '../api'
 import AdminLayout from './AdminLayout'
 
 const Dashboard = () => {
@@ -14,6 +15,7 @@ const Dashboard = () => {
   })
   const [recentInquiries, setRecentInquiries] = useState([])
   const [recentSellRequests, setRecentSellRequests] = useState([])
+  const [crmSummary, setCrmSummary] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -28,6 +30,7 @@ const Dashboard = () => {
         api.get('/inquiries/sell-requests/'),
         api.get('/properties/build/'),
       ])
+      const crmRes = await crmAPI.getSummary()
 
       const properties = propertiesRes.data.results || propertiesRes.data
       const inquiries = inquiriesRes.data.results || inquiriesRes.data
@@ -53,6 +56,7 @@ const Dashboard = () => {
 
       setRecentInquiries(inquiries.filter(i => !i.is_read).slice(0, 5))
       setRecentSellRequests(sellRequests.slice(0, 5))
+      setCrmSummary(crmRes.data)
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
     } finally {
@@ -69,13 +73,37 @@ const Dashboard = () => {
   }
 
   const statCards = [
-    { title: 'Total Properties', value: stats.totalProperties, color: 'bg-blue-600', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
-    { title: 'Available Units', value: stats.availableProperties, color: 'bg-emerald-600', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { title: 'Sold Out', value: stats.soldProperties, color: 'bg-rose-600', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { title: 'Inquiries', value: stats.totalInquiries, color: 'bg-indigo-600', icon: 'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4', badge: stats.unreadInquiries },
-    { title: 'Sell Requests', value: stats.sellRequests, color: 'bg-amber-600', icon: 'M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z M2 17l.621-1.342a7 7 0 0112.758 0L16 17H2z' },
-    { title: 'Build Projects', value: stats.buildProjects || 0, color: 'bg-cyan-600', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+    { title: 'Total Properties', value: stats.totalProperties, color: 'bg-blue-600', textClass: 'text-blue-600', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+    { title: 'Available Units', value: stats.availableProperties, color: 'bg-emerald-600', textClass: 'text-emerald-600', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { title: 'Sold Out', value: stats.soldProperties, color: 'bg-rose-600', textClass: 'text-rose-600', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { title: 'Inquiries', value: stats.totalInquiries, color: 'bg-indigo-600', textClass: 'text-indigo-600', icon: 'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4', badge: stats.unreadInquiries },
+    { title: 'Sell Requests', value: stats.sellRequests, color: 'bg-amber-600', textClass: 'text-amber-600', icon: 'M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z M2 17l.621-1.342a7 7 0 0112.758 0L16 17H2z' },
+    { title: 'Build Projects', value: stats.buildProjects || 0, color: 'bg-cyan-600', textClass: 'text-cyan-600', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
   ]
+
+  const crmCards = [
+    { title: 'Total Customers', value: crmSummary?.total_customers || 0, color: 'bg-amber-600', textClass: 'text-amber-600', icon: 'M17 21h5v-2a4 4 0 00-5-3.87M9 21H4v-2a4 4 0 015-3.87m8-7.13a4 4 0 11-8 0 4 4 0 018 0z' },
+    { title: 'Residential Projects', value: crmSummary?.residential_projects || 0, color: 'bg-emerald-600', textClass: 'text-emerald-600', icon: 'M3 11l9-8 9 8M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3M9 21h6' },
+    { title: 'Commercial Projects', value: crmSummary?.commercial_projects || 0, color: 'bg-blue-600', textClass: 'text-blue-600', icon: 'M3 21h18M5 21V7l8-4v18M19 21V11l-6-3' },
+    { title: 'Completed Projects', value: crmSummary?.completed_projects || 0, color: 'bg-rose-600', textClass: 'text-rose-600', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
+    { title: 'Ongoing Projects', value: crmSummary?.ongoing_projects || 0, color: 'bg-violet-600', textClass: 'text-violet-600', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { title: 'New Leads', value: crmSummary?.new_leads || 0, color: 'bg-orange-600', textClass: 'text-orange-600', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+  ]
+
+  const renderChartBars = (items = []) => {
+    const maxValue = Math.max(...items.map(item => item.value || 0), 1)
+    return items.map((item, index) => (
+      <div key={index} className="mb-4 last:mb-0">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-bold text-gray-700">{item.label}</span>
+          <span className="text-xs font-black text-accent">{item.value}</span>
+        </div>
+        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-full rounded-full bg-gradient-to-r from-accent-dark to-accent" style={{ width: `${(item.value / maxValue) * 100}%` }} />
+        </div>
+      </div>
+    ))
+  }
 
   if (loading) {
     return (
@@ -99,7 +127,7 @@ const Dashboard = () => {
             className="group bg-white rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 p-6 border border-gray-100 flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-start justify-between mb-8">
-              <div className={`${stat.color} bg-opacity-10 p-4 rounded-2xl ${stat.color.replace('bg-', 'text-')} transition-transform group-hover:scale-110 duration-500`}>
+              <div className={`${stat.color} bg-opacity-10 p-4 rounded-2xl ${stat.textClass} transition-transform group-hover:scale-110 duration-500`}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d={stat.icon} />
                 </svg>
@@ -119,6 +147,53 @@ const Dashboard = () => {
             <div className={`absolute -bottom-10 -right-10 w-32 h-32 ${stat.color} opacity-[0.03] rounded-full group-hover:scale-150 transition-transform duration-700`}></div>
           </div>
         ))}
+      </div>
+
+      {/* CRM Overview */}
+      <div className="mb-12">
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">CRM Overview</h2>
+            <p className="text-sm text-gray-500 font-medium">Customer pipeline, project mix, and lead activity</p>
+          </div>
+          <div className="flex gap-3">
+            <Link to="/admin/customers" className="bg-white px-4 py-2 rounded-xl text-xs font-bold text-accent shadow-sm border border-gray-100 hover:bg-accent hover:text-white transition-all">View Customers</Link>
+            <Link to="/admin/customers/add" className="bg-accent text-primary px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-accent-light transition-all">Add Customer</Link>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+          {crmCards.map((stat, index) => (
+            <div key={index} className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 p-6 border border-gray-100 relative overflow-hidden">
+              <div className="flex items-start justify-between mb-8">
+                <div className={`${stat.color} bg-opacity-10 p-4 rounded-2xl ${stat.textClass} transition-transform duration-500`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d={stat.icon} />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-4xl font-black text-gray-900 mb-1 tracking-tight">{stat.value}</p>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{stat.title}</p>
+              <div className={`absolute -bottom-10 -right-10 w-32 h-32 ${stat.color} opacity-[0.03] rounded-full`}></div>
+            </div>
+          ))}
+        </div>
+
+        {crmSummary && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Project Type Mix</h3>
+              <p className="text-xs font-medium text-gray-500 mb-6">Distribution of active CRM projects</p>
+              {renderChartBars(crmSummary.project_type_breakdown || [])}
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Monthly Customer Growth</h3>
+              <p className="text-xs font-medium text-gray-500 mb-6">New customers added in the last 12 months</p>
+              {renderChartBars(crmSummary.monthly_growth || [])}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
